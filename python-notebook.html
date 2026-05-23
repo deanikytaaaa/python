@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Notebook</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14; --surface: #161a22; --surface2: #1e2330; --border: #2a3040;
+    --accent: #3b82f6; --accent2: #1d4ed8;
+    --green: #00ff88; --red: #ff4466; --yellow: #ffd600;
+    --text: #e8eaf0; --text2: #8892a4; --text3: #4a5568;
+    --font-mono: 'JetBrains Mono', monospace; --font-ui: 'Space Grotesk', sans-serif;
+    --radius: 10px; --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+  .light {
+    --bg: #f0f2f7; --surface: #ffffff; --surface2: #e8ecf4; --border: #d0d7e3;
+    --accent: #2563eb; --green: #00aa55; --red: #dd2244; --yellow: #cc8800;
+    --text: #1a1f2e; --text2: #4a5568; --text3: #a0aab8; --shadow: 0 4px 24px rgba(0,0,0,0.1);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font-ui); min-height:100vh; transition:background 0.3s,color 0.3s; }
+  header { display:flex; align-items:center; justify-content:space-between; padding:14px 24px; background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; box-shadow:var(--shadow); gap:12px; flex-wrap:wrap; }
+  .logo { display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.1rem; letter-spacing:-0.02em; }
+  .logo-icon { width:32px; height:32px; background:linear-gradient(135deg,#3b82f6,#1d4ed8); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; }
+  .logo span { color:var(--accent); }
+  .header-status { font-family:var(--font-mono); font-size:0.72rem; color:var(--text3); background:var(--surface2); padding:4px 10px; border-radius:20px; border:1px solid var(--border); }
+  .header-status.ready { color:var(--green); border-color:rgba(0,255,136,0.3); }
+  .header-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .btn { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:7px; font-family:var(--font-ui); font-size:0.82rem; font-weight:600; cursor:pointer; border:none; transition:all 0.15s; white-space:nowrap; }
+  .btn-ghost { background:transparent; color:var(--text2); border:1px solid var(--border); }
+  .btn-ghost:hover { background:var(--surface2); color:var(--text); }
+  .btn-accent { background:var(--accent); color:#fff; }
+  .btn-accent:hover { opacity:0.85; transform:translateY(-1px); }
+  .icon-btn { background:var(--surface2); border:1px solid var(--border); color:var(--text2); width:34px; height:34px; border-radius:7px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px; transition:all 0.15s; }
+  .icon-btn:hover { background:var(--border); color:var(--text); }
+  main { max-width:900px; margin:0 auto; padding:28px 20px 80px; }
+  .toolbar { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; align-items:center; }
+  .dropdown { position:relative; }
+  .dropdown-menu { display:none; position:absolute; top:calc(100% + 6px); left:0; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); min-width:240px; box-shadow:var(--shadow); z-index:200; overflow:hidden; }
+  .dropdown-menu.open { display:block; }
+  .dropdown-item { padding:10px 14px; cursor:pointer; font-size:0.85rem; transition:background 0.1s; display:flex; align-items:center; gap:8px; }
+  .dropdown-item:hover { background:var(--surface2); }
+  .tag { font-family:var(--font-mono); font-size:0.75rem; background:var(--surface2); color:var(--accent); padding:2px 6px; border-radius:4px; }
+  #cells { display:flex; flex-direction:column; gap:16px; }
+  .cell { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); transition:border-color 0.2s; animation:cellIn 0.25s ease; }
+  @keyframes cellIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .cell:focus-within { border-color:var(--accent); }
+  .cell-header { display:flex; align-items:center; gap:8px; padding:8px 12px; background:var(--surface2); border-bottom:1px solid var(--border); }
+  .cell-num { font-family:var(--font-mono); font-size:0.72rem; color:var(--text3); min-width:30px; }
+  .cell-label { flex:1; background:transparent; border:none; color:var(--text2); font-family:var(--font-ui); font-size:0.82rem; font-weight:500; outline:none; }
+  .cell-label::placeholder { color:var(--text3); }
+  .cell-label:focus { color:var(--text); }
+  .cell-actions { display:flex; gap:5px; }
+  .run-btn { display:flex; align-items:center; gap:5px; padding:4px 12px; background:var(--accent); color:#fff; border:none; border-radius:5px; font-family:var(--font-ui); font-size:0.78rem; font-weight:700; cursor:pointer; transition:all 0.15s; }
+  .run-btn:hover { opacity:0.85; }
+  .run-btn:disabled { opacity:0.5; cursor:not-allowed; }
+  .run-btn.running { background:var(--yellow); color:#000; }
+  .small-btn { background:var(--surface); border:1px solid var(--border); color:var(--text2); width:26px; height:26px; border-radius:5px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:13px; transition:all 0.12s; }
+  .small-btn:hover { background:var(--border); color:var(--text); }
+  .small-btn.del:hover { background:var(--red); color:#fff; border-color:var(--red); }
+  .code-textarea { width:100%; min-height:120px; background:var(--bg); color:var(--text); font-family:var(--font-mono); font-size:0.85rem; line-height:1.65; border:none; padding:14px 16px; resize:vertical; outline:none; tab-size:4; transition:background 0.3s; }
+  .cell-output { border-top:1px solid var(--border); background:var(--bg); }
+  .output-bar { display:flex; align-items:center; gap:8px; padding:6px 12px; border-bottom:1px solid var(--border); background:var(--surface2); }
+  .output-label { font-size:0.72rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--text3); }
+  .status-dot { width:7px; height:7px; border-radius:50%; background:var(--text3); }
+  .status-dot.ok { background:var(--green); box-shadow:0 0 6px var(--green); }
+  .status-dot.err { background:var(--red); box-shadow:0 0 6px var(--red); }
+  .status-dot.running { background:var(--yellow); animation:pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .exec-time { font-size:0.72rem; color:var(--text3); margin-left:auto; font-family:var(--font-mono); }
+  .output-content { padding:12px 16px; font-family:var(--font-mono); font-size:0.82rem; line-height:1.7; white-space:pre-wrap; word-break:break-word; max-height:320px; overflow-y:auto; }
+  .output-content.success { color:var(--green); }
+  .output-content.error { color:var(--red); }
+  .output-content.empty { color:var(--text3); font-style:italic; }
+  .spinner { display:inline-block; width:12px; height:12px; border:2px solid transparent; border-top-color:currentColor; border-radius:50%; animation:spin 0.6s linear infinite; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .add-cell-area { display:flex; justify-content:center; padding:8px 0; }
+  .add-cell-btn { display:flex; align-items:center; gap:6px; padding:8px 20px; background:transparent; border:1.5px dashed var(--border); border-radius:var(--radius); color:var(--text3); font-family:var(--font-ui); font-size:0.82rem; font-weight:600; cursor:pointer; transition:all 0.15s; width:100%; justify-content:center; }
+  .add-cell-btn:hover { border-color:var(--accent); color:var(--accent); background:rgba(59,130,246,0.04); }
+  .toast-container { position:fixed; bottom:24px; right:24px; z-index:999; display:flex; flex-direction:column; gap:8px; }
+  .toast { background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--accent); padding:10px 16px; border-radius:var(--radius); font-size:0.83rem; box-shadow:var(--shadow); animation:toastIn 0.2s ease; max-width:300px; }
+  @keyframes toastIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .toast.success { border-left-color:var(--green); }
+  .toast.error { border-left-color:var(--red); }
+  .loading-banner { background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.3); border-radius:8px; padding:12px 16px; margin-bottom:16px; font-size:0.83rem; color:var(--accent); display:flex; align-items:center; gap:8px; }
+</style>
+</head>
+<body>
+<header>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="logo"><div class="logo-icon">🐍</div>Python<span>Notebook</span></div>
+    <div class="header-status" id="pyStatus">Initializing...</div>
+  </div>
+  <div class="header-actions">
+    <div class="dropdown" id="templateDropdown">
+      <button class="btn btn-ghost" onclick="toggleDropdown()">📋 Templates ▾</button>
+      <div class="dropdown-menu" id="templateMenu">
+        <div class="dropdown-item" onclick="addFromTemplate('Hello World','hello')">🐍 Hello World</div>
+        <div class="dropdown-item" onclick="addFromTemplate('Math & List','math')">🔢 Math & List</div>
+        <div class="dropdown-item" onclick="addFromTemplate('String Ops','string')">📝 String Operations</div>
+        <div class="dropdown-item" onclick="addFromTemplate('Dict & JSON','dict')">📦 Dict & JSON</div>
+        <div class="dropdown-item" onclick="addFromTemplate('Numpy Array','numpy')">🔬 Numpy Array</div>
+        <div class="dropdown-item" onclick="addFromTemplate('Pandas DataFrame','pandas')">🐼 Pandas DataFrame</div>
+        <div class="dropdown-item" onclick="addFromTemplate('OOP Class','oop')">🏗️ OOP Class</div>
+        <div class="dropdown-item" onclick="addFromTemplate('File & Input','input')">⌨️ Input Simulation</div>
+      </div>
+    </div>
+    <button class="btn btn-ghost" onclick="runAll()">▶▶ Run All</button>
+    <button class="btn btn-ghost" onclick="clearAll()">🗑 Clear All</button>
+    <button class="btn btn-ghost" onclick="downloadNB()">⬇ Download</button>
+    <button class="btn btn-accent" onclick="saveNB()">💾 Save</button>
+    <button class="icon-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+  </div>
+</header>
+<main>
+  <div id="loadingBanner" class="loading-banner"><span class="spinner"></span> Loading Python runtime (Pyodide)... Harap tunggu ~10–30 detik.</div>
+  <div class="toolbar">
+    <button class="btn btn-ghost" onclick="addCell('New Cell','')">＋ Add Cell</button>
+    <button class="btn btn-ghost" onclick="runAll()">▶ Run All</button>
+  </div>
+  <div id="cells"></div>
+  <div class="add-cell-area"><button class="add-cell-btn" onclick="addCell('New Cell','')">＋ Add Python Cell</button></div>
+</main>
+<div class="toast-container" id="toastContainer"></div>
+<script>
+let isDark=true, cellCount=0, pyodide=null, pyodideReady=false, pyodideLoading=false;
+
+const TEMPLATES = {
+  hello: `print("🐍 Hello, Python!")
+print("Versi Python tersedia via Pyodide")
+
+name = "Budi"
+print(f"Halo, {name}!")`,
+  math: `import math
+
+# Operasi matematika
+print("π =", math.pi)
+print("e =", math.e)
+print("sqrt(144) =", math.sqrt(144))
+
+# List comprehension
+squares = [x**2 for x in range(1, 11)]
+print("Squares:", squares)
+
+evens = [x for x in range(20) if x % 2 == 0]
+print("Evens:", evens)`,
+  string: `# String operations
+text = "Hello, Python Programmer!"
+
+print("Upper:", text.upper())
+print("Lower:", text.lower())
+print("Words:", text.split())
+print("Replace:", text.replace("Python", "World"))
+print("Length:", len(text))
+print("Reversed:", text[::-1])
+print("Starts with Hello:", text.startswith("Hello"))`,
+  dict: `import json
+
+# Dictionary
+mahasiswa = {
+    "nama": "Budi Santoso",
+    "umur": 21,
+    "jurusan": "Informatika",
+    "nilai": [85, 90, 78, 92]
+}
+
+print("Nama:", mahasiswa["nama"])
+print("Rata nilai:", sum(mahasiswa["nilai"]) / len(mahasiswa["nilai"]))
+
+# JSON
+json_str = json.dumps(mahasiswa, indent=2)
+print("\\nJSON output:")
+print(json_str)`,
+  numpy: `import numpy as np
+
+# Array operations
+arr = np.array([1, 2, 3, 4, 5])
+print("Array:", arr)
+print("Mean:", np.mean(arr))
+print("Std:", np.std(arr))
+print("Sum:", np.sum(arr))
+
+# Matrix
+mat = np.array([[1,2,3],[4,5,6],[7,8,9]])
+print("\\nMatrix:")
+print(mat)
+print("Transpose:")
+print(mat.T)
+print("Matrix sum:", np.sum(mat))`,
+  pandas: `import pandas as pd
+
+data = {
+    "Nama": ["Budi", "Sari", "Andi", "Rina"],
+    "Divisi": ["Engineering", "Design", "Engineering", "Product"],
+    "Gaji": [9000000, 8000000, 10000000, 11000000],
+    "Tahun": [2020, 2021, 2019, 2018]
+}
+
+df = pd.DataFrame(data)
+print(df)
+print("\\nStatistik Gaji:")
+print(df["Gaji"].describe())
+print("\\nRata-rata per Divisi:")
+print(df.groupby("Divisi")["Gaji"].mean())`,
+  oop: `class Kendaraan:
+    def __init__(self, merk, tahun, kecepatan_max):
+        self.merk = merk
+        self.tahun = tahun
+        self.kecepatan_max = kecepatan_max
+        self.kecepatan = 0
+
+    def gas(self, tambah):
+        self.kecepatan = min(self.kecepatan + tambah, self.kecepatan_max)
+        print(f"{self.merk}: kecepatan {self.kecepatan} km/h")
+
+    def rem(self):
+        self.kecepatan = 0
+        print(f"{self.merk}: berhenti")
+
+    def info(self):
+        print(f"{self.merk} ({self.tahun}) - Max: {self.kecepatan_max} km/h")
+
+mobil = Kendaraan("Toyota", 2022, 180)
+mobil.info()
+mobil.gas(60)
+mobil.gas(80)
+mobil.rem()`,
+  input: `# Simulasi input (hardcoded untuk demo)
+nama = "Budi"
+umur = 21
+
+print(f"Nama: {nama}")
+print(f"Umur: {umur}")
+print(f"Tahun lahir kira-kira: {2024 - umur}")
+
+# Fungsi sederhana
+def sapa(nama, umur):
+    if umur < 18:
+        return f"Halo {nama}, masih muda!"
+    elif umur < 30:
+        return f"Halo {nama}, usia produktif!"
+    else:
+        return f"Halo {nama}, senior developer!"
+
+print(sapa(nama, umur))`
+};
+
+// ===== PYODIDE =====
+async function loadPyodide() {
+  if (pyodideReady || pyodideLoading) return;
+  pyodideLoading = true;
+  try {
+    await new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js';
+      s.onload = res; s.onerror = () => rej(new Error('Gagal load Pyodide'));
+      document.head.appendChild(s);
+    });
+    pyodide = await window.loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/' });
+    pyodideReady = true;
+    pyodideLoading = false;
+    document.getElementById('pyStatus').textContent = 'Python Ready ✓';
+    document.getElementById('pyStatus').className = 'header-status ready';
+    document.getElementById('loadingBanner').style.display = 'none';
+    showToast('🐍 Python siap!', 'success');
+  } catch(e) {
+    pyodideLoading = false;
+    document.getElementById('pyStatus').textContent = 'Load Failed';
+    document.getElementById('loadingBanner').innerHTML = '❌ Gagal load Python. Buka file ini di Chrome/Firefox.';
+    showToast('Gagal load Python', 'error');
+  }
+}
+
+// ===== CELL =====
+function addCell(label='New Cell', code='') {
+  cellCount++;
+  const id = 'cell_' + Date.now();
+  const div = document.createElement('div');
+  div.className = 'cell'; div.id = id;
+  div.innerHTML = `
+    <div class="cell-header">
+      <span class="cell-num">[${cellCount}]</span>
+      <input class="cell-label" value="${label}" placeholder="Cell label..." oninput="saveNBauto()">
+      <div class="cell-actions">
+        <button class="small-btn" onclick="moveCell('${id}',-1)" title="Naik">↑</button>
+        <button class="small-btn" onclick="moveCell('${id}',1)" title="Turun">↓</button>
+        <button class="small-btn" onclick="dupCell('${id}')" title="Duplikat">⧉</button>
+        <button class="small-btn del" onclick="deleteCell('${id}')" title="Hapus">✕</button>
+        <button class="run-btn" id="runBtn_${id}" onclick="runCell('${id}')">▶ Run</button>
+      </div>
+    </div>
+    <textarea class="code-textarea" id="code_${id}" spellcheck="false"
+      placeholder="# Tulis kode Python di sini..."
+      onkeydown="handleKey(event,'${id}')"
+      oninput="saveNBauto()">${escH(code)}</textarea>
+    <div class="cell-output" id="output_${id}" style="display:none">
+      <div class="output-bar">
+        <div class="status-dot" id="dot_${id}"></div>
+        <span class="output-label">Output</span>
+        <span class="exec-time" id="time_${id}"></span>
+      </div>
+      <div class="output-content" id="content_${id}"></div>
+    </div>`;
+  document.getElementById('cells').appendChild(div);
+  updateCellNumbers();
+  saveNBauto();
+  div.querySelector('textarea').focus();
+}
+
+function escH(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function handleKey(e, id) {
+  if (e.key === 'Tab') { e.preventDefault(); const ta=e.target,s=ta.selectionStart; ta.value=ta.value.substring(0,s)+'    '+ta.value.substring(ta.selectionEnd); ta.selectionStart=ta.selectionEnd=s+4; }
+  if ((e.ctrlKey||e.metaKey) && e.key==='Enter') { e.preventDefault(); runCell(id); }
+}
+
+function addFromTemplate(label, key) { addCell(label, TEMPLATES[key]||''); }
+function deleteCell(id) { document.getElementById(id)?.remove(); updateCellNumbers(); saveNBauto(); showToast('Cell dihapus','error'); }
+function moveCell(id, dir) {
+  const cell=document.getElementById(id), cont=document.getElementById('cells');
+  const cells=[...cont.children], idx=cells.indexOf(cell), target=cells[idx+dir];
+  if (!target) return;
+  dir===-1 ? cont.insertBefore(cell,target) : cont.insertBefore(target,cell);
+  updateCellNumbers(); saveNBauto();
+}
+function dupCell(id) {
+  const code = document.getElementById('code_'+id)?.value||'';
+  const label = document.getElementById(id)?.querySelector('.cell-label')?.value||'Copy';
+  addCell('Copy of '+label, code);
+}
+function updateCellNumbers() {
+  document.querySelectorAll('.cell').forEach((c,i)=>{ const n=c.querySelector('.cell-num'); if(n) n.textContent=`[${i+1}]`; });
+  cellCount = document.querySelectorAll('.cell').length;
+}
+function clearAll() { if(!confirm('Hapus semua cell?')) return; document.getElementById('cells').innerHTML=''; cellCount=0; saveNBauto(); showToast('Semua cell dihapus'); }
+
+// ===== RUN =====
+async function runCell(id) {
+  if (!pyodideReady) {
+    showToast('⏳ Python masih loading...'); return;
+  }
+  const code = document.getElementById('code_'+id)?.value;
+  if (!code?.trim()) { showToast('Cell kosong!','error'); return; }
+  const btn=document.getElementById('runBtn_'+id), outDiv=document.getElementById('output_'+id);
+  const content=document.getElementById('content_'+id), dot=document.getElementById('dot_'+id), timeEl=document.getElementById('time_'+id);
+  btn.disabled=true; btn.className='run-btn running'; btn.innerHTML='<span class="spinner"></span> Running...';
+  outDiv.style.display='block'; dot.className='status-dot running';
+  content.className='output-content'; content.textContent=''; timeEl.textContent='';
+  const start=Date.now();
+  try {
+    pyodide.runPython(`import sys,io\n_buf=io.StringIO()\nsys.stdout=_buf\nsys.stderr=_buf`);
+    await pyodide.runPythonAsync(code);
+    const out = pyodide.runPython(`_v=_buf.getvalue()\nsys.stdout=sys.__stdout__\nsys.stderr=sys.__stderr__\n_v`);
+    const elapsed=((Date.now()-start)/1000).toFixed(3); timeEl.textContent=elapsed+'s';
+    if (out && out.trim()) { content.className='output-content success'; content.textContent=out; dot.className='status-dot ok'; }
+    else { content.className='output-content empty'; content.textContent='(Tidak ada output)'; dot.className='status-dot'; }
+  } catch(e) {
+    const elapsed=((Date.now()-start)/1000).toFixed(3); timeEl.textContent=elapsed+'s';
+    content.className='output-content error'; content.textContent='❌ '+e.message; dot.className='status-dot err';
+    try { pyodide.runPython(`import sys\nsys.stdout=sys.__stdout__\nsys.stderr=sys.__stderr__`); } catch(_){}
+  }
+  btn.disabled=false; btn.className='run-btn'; btn.innerHTML='▶ Run';
+}
+
+async function runAll() {
+  const cells=document.querySelectorAll('.cell');
+  if (!cells.length) { showToast('Tidak ada cell!','error'); return; }
+  showToast('Menjalankan '+cells.length+' cell...');
+  for (const c of cells) { await runCell(c.id); await new Promise(r=>setTimeout(r,300)); }
+  showToast('Semua cell selesai! ✅','success');
+}
+
+// ===== SAVE/LOAD =====
+function getData() {
+  const cells=document.querySelectorAll('.cell');
+  return [...cells].map(c=>({ label:c.querySelector('.cell-label')?.value||'', code:document.getElementById('code_'+c.id)?.value||'' }));
+}
+function saveNB() { try { localStorage.setItem('py_notebook_v1',JSON.stringify(getData())); showToast('💾 Tersimpan!','success'); } catch(e){ showToast('Gagal simpan','error'); } }
+function saveNBauto() { try { localStorage.setItem('py_notebook_auto',JSON.stringify(getData())); } catch(e){} }
+function downloadNB() {
+  const blob=new Blob([JSON.stringify(getData(),null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='python-notebook.json'; a.click();
+  showToast('⬇ Downloaded!');
+}
+function loadFromStorage() {
+  try {
+    const raw=localStorage.getItem('py_notebook_v1')||localStorage.getItem('py_notebook_auto');
+    if (raw) { const data=JSON.parse(raw); if(data.length){ data.forEach(d=>addCell(d.label,d.code)); showToast(data.length+' cell dimuat 💾','success'); return true; } }
+  } catch(e){}
+  return false;
+}
+function toggleTheme(){ isDark=!isDark; document.body.classList.toggle('light',!isDark); document.getElementById('themeBtn').textContent=isDark?'🌙':'☀️'; }
+function toggleDropdown(){ document.getElementById('templateMenu').classList.toggle('open'); }
+document.addEventListener('click',e=>{ if(!document.getElementById('templateDropdown').contains(e.target)) document.getElementById('templateMenu').classList.remove('open'); });
+document.addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveNB();} });
+function showToast(msg,type='') { const c=document.getElementById('toastContainer'); const t=document.createElement('div'); t.className='toast '+type; t.textContent=msg; c.appendChild(t); setTimeout(()=>t.remove(),3000); }
+
+// Init
+loadPyodide();
+if (!loadFromStorage()) { addCell('Hello World', TEMPLATES.hello); }
+</script>
+</body>
+</html>
